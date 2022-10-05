@@ -1,0 +1,3 @@
+[submodule "adain"]
+	path = adain
+	url = git@github.com:2JS/pytorch-AdaIN.git
