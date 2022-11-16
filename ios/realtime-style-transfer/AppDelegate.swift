@@ -1,10 +1,3 @@
-//
-//  AppDelegate.swift
-//  realtime-style-transfer
-//
-//  Created by Jun Seok Lee on 2022/09/24.
-//
-
 import UIKit
 
 @main
