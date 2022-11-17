@@ -10,7 +10,6 @@ class CameraViewController: UIViewController {
     private let previewView = PreviewView()
     private let transferredView = UIImageView()
 
-    let device = MTLCreateSystemDefaultDevice()!
     let cicontext = CIContext()
 
     private let encoder = try! adain_vgg(configuration: MLModelConfiguration().then {
@@ -25,10 +24,14 @@ class CameraViewController: UIViewController {
 
     private var cancellableBag = Set<AnyCancellable>()
 
+    private var modelInputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .rgba32Float, usage: [.shaderRead, .shaderWrite])!
+    private var modelOutputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .rgba32Float, usage: [.shaderRead, .shaderWrite])!
+    private var a = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .bgra8Unorm, usage: [.shaderRead, .shaderWrite])
+
     var textureCache: CVMetalTextureCache!
 
     override func viewDidLoad() {
-        CVMetalTextureCacheCreate(kCFAllocatorDefault, nil, self.device, nil, &textureCache)
+        CVMetalTextureCacheCreate(kCFAllocatorDefault, nil, GPU.device, nil, &textureCache)
 
         super.viewDidLoad()
 
@@ -43,14 +46,14 @@ class CameraViewController: UIViewController {
 //        previewView.session = session
 
         videoStream.publisher
-//            .throttle(for: 1, scheduler: RunLoop.current, latest: false)
-            .map { sampleBuffer in
+            .throttle(for: 0.066, scheduler: RunLoop.current, latest: true)
+            .sink { [unowned self] sampleBuffer in
                 let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
 
                 let colorFormat: MTLPixelFormat = .bgra8Unorm
                 let width = CVPixelBufferGetWidth(imageBuffer)
-
                 let height = CVPixelBufferGetHeight(imageBuffer)
+
                 var texture: CVMetalTexture!
                 let status = CVMetalTextureCacheCreateTextureFromImage(
                     kCFAllocatorDefault,
@@ -64,14 +67,32 @@ class CameraViewController: UIViewController {
                     &texture
                 )
 
+
                 if status != kCVReturnSuccess {
 
                 }
 
-                return CVMetalTextureGetTexture(texture)!
-            }
-            .sink { mtlTexture in
-                let uiImage = UIImage(ciImage: CIImage(mtlTexture: mtlTexture)!.oriented(.right))
+                let mtlTexture = CVMetalTextureGetTexture(texture)!
+
+                try! mtlTexture.convert(into: self.modelInputBuffer.texture)
+
+                guard let input = self.modelInputBuffer.mlmultiarray
+                else {
+                    return
+                }
+                let start = CFAbsoluteTimeGetCurrent()
+                let output = try! encoder.prediction(input: adain_vggInput(x: input)).var_171
+                let duration = CFAbsoluteTimeGetCurrent() - start
+
+                print(output, duration)
+
+                let decoded = try! decoder.prediction(input: adain_decInput(x: output)).var_138
+
+                print(decoded)
+
+                modelOutputBuffer.mlmultiarray = decoded
+
+                let uiImage = UIImage(ciImage: CIImage(mtlTexture: modelOutputBuffer.texture.converted(pixelFormat: .bgra8Unorm)!)!.oriented(.upMirrored))
 
                 DispatchQueue.main.async { [weak self] in
                     self?.transferredView.image = uiImage
@@ -96,7 +117,7 @@ class CameraViewController: UIViewController {
 
     private static func previewFrame(bounds: CGRect, targetRatio: CGSize) -> CGRect {
         let woh = targetRatio.width / targetRatio.height
-        if bounds.width / bounds.height > woh {
+        if bounds.width / bounds.height < woh {
             let widthDiff = bounds.width - bounds.height * woh
             return bounds.insetBy(dx: widthDiff / 2, dy: 0)
         } else {
@@ -136,16 +157,7 @@ class CameraViewController: UIViewController {
         session.beginConfiguration()
         defer { session.commitConfiguration() }
 
-//        let videoDevice: AVCaptureDevice
-//        if let v = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .unspecified) {
-//            videoDevice = v
-//        } else if let v = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .unspecified) {
-//            videoDevice = v
-//        } else {
-//            return
-//        }
-
-        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .unspecified)
+        guard let videoDevice = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .unspecified)
         else { return }
 
         guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice),
@@ -165,18 +177,12 @@ class CameraViewController: UIViewController {
         guard session.canAddOutput(videoOutput)
         else { return }
         videoOutput.setSampleBufferDelegate(videoStream, queue: videoStream.queue)
-//        print(videoOutput.availableVideoPixelFormatTypes)
         videoOutput.videoSettings = [
             kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)
         ]
-        print(videoOutput.availableVideoPixelFormatTypes)
-        print(kCVPixelFormatType_32RGBA)
-//        videoOutput.connection(with: .video)?.videoOrientation = .landscapeRight
-//        videoOutput.automaticallyConfiguresOutputBufferDimensions = false
-//        videoOutput.videoSettings = [
-//            kCVPixelBufferWidthKey as String: 512,
-//            kCVPixelBufferHeightKey as String: 512
-//        ]
+        videoOutput.alwaysDiscardsLateVideoFrames = true
         session.addOutput(videoOutput)
+
+        videoOutput.connection(with: .video)?.videoOrientation = .portraitUpsideDown
     }
 }
