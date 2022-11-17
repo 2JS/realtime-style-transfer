@@ -25,7 +25,6 @@ struct TextureBuffer {
         set {
             guard let dataPointer = newValue?.dataPointer
             else { return }
-//            Data(bytesNoCopy: dataPointer, count: height * width * pixelFormat.bytesPerPixel, deallocator: .none)
             memcpy(buffer.contents(), dataPointer, buffer.length)
         }
     }

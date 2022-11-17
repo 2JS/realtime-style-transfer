@@ -12,27 +12,9 @@ class CameraViewController: UIViewController {
 
     let cicontext = CIContext()
 
-    private let encoder = try! adain_vgg(configuration: MLModelConfiguration().then {
-        $0.computeUnits = .all
-        $0.allowLowPrecisionAccumulationOnGPU = true
-    })
-
-    private let decoder = try! adain_dec(configuration: MLModelConfiguration().then {
-        $0.computeUnits = .all
-        $0.allowLowPrecisionAccumulationOnGPU = true
-    })
-
     private var cancellableBag = Set<AnyCancellable>()
 
-    private var modelInputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .rgba32Float, usage: [.shaderRead, .shaderWrite])!
-    private var modelOutputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .rgba32Float, usage: [.shaderRead, .shaderWrite])!
-    private var a = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .bgra8Unorm, usage: [.shaderRead, .shaderWrite])
-
-    var textureCache: CVMetalTextureCache!
-
     override func viewDidLoad() {
-        CVMetalTextureCacheCreate(kCFAllocatorDefault, nil, GPU.device, nil, &textureCache)
-
         super.viewDidLoad()
 
         view.backgroundColor = .black
@@ -43,56 +25,15 @@ class CameraViewController: UIViewController {
 
         setupSession()
 
-//        previewView.session = session
-
         videoStream.publisher
             .throttle(for: 0.066, scheduler: RunLoop.current, latest: true)
             .sink { [unowned self] sampleBuffer in
-                let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
-
-                let colorFormat: MTLPixelFormat = .bgra8Unorm
-                let width = CVPixelBufferGetWidth(imageBuffer)
-                let height = CVPixelBufferGetHeight(imageBuffer)
-
-                var texture: CVMetalTexture!
-                let status = CVMetalTextureCacheCreateTextureFromImage(
-                    kCFAllocatorDefault,
-                    self.textureCache,
-                    imageBuffer,
-                    nil,
-                    colorFormat,
-                    width,
-                    height,
-                    0,
-                    &texture
-                )
-
-
-                if status != kCVReturnSuccess {
-
-                }
-
-                let mtlTexture = CVMetalTextureGetTexture(texture)!
-
-                try! mtlTexture.convert(into: self.modelInputBuffer.texture)
-
-                guard let input = self.modelInputBuffer.mlmultiarray
+                guard let ciImage =  Processor.shared.process(sampleBuffer: sampleBuffer)
                 else {
                     return
                 }
-                let start = CFAbsoluteTimeGetCurrent()
-                let output = try! encoder.prediction(input: adain_vggInput(x: input)).var_171
-                let duration = CFAbsoluteTimeGetCurrent() - start
 
-                print(output, duration)
-
-                let decoded = try! decoder.prediction(input: adain_decInput(x: output)).var_138
-
-                print(decoded)
-
-                modelOutputBuffer.mlmultiarray = decoded
-
-                let uiImage = UIImage(ciImage: CIImage(mtlTexture: modelOutputBuffer.texture.converted(pixelFormat: .bgra8Unorm)!)!.oriented(.upMirrored))
+                let uiImage = UIImage(ciImage: ciImage, scale: 1, orientation: .upMirrored)
 
                 DispatchQueue.main.async { [weak self] in
                     self?.transferredView.image = uiImage
