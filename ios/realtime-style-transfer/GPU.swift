@@ -1,3 +1,4 @@
+import CoreImage
 import CoreML
 import Metal
 import MetalPerformanceShaders
@@ -5,6 +6,7 @@ import MetalPerformanceShaders
 class GPU {
     static let device = MTLCreateSystemDefaultDevice()!
     static let queue = device.makeCommandQueue()!
+    static let ciContext = CIContext(mtlCommandQueue: queue)
 }
 
 extension MTLTexture {

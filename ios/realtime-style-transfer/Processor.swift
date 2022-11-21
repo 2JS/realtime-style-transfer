@@ -1,7 +1,12 @@
 import AVFoundation
-import CoreImage
 import CoreML
+import MetalKit
 import MetalPerformanceShaders
+import UIKit
+
+
+let width = 640
+let height = 480
 
 class Processor {
     static let shared = Processor()
@@ -16,9 +21,15 @@ class Processor {
         $0.allowLowPrecisionAccumulationOnGPU = true
     })
 
+    private let loader = MTKTextureLoader(device: GPU.device)
+
     private var modelInputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .rgba32Float, usage: [.shaderRead, .shaderWrite])!
     private var modelOutputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .rgba32Float, usage: [.shaderRead, .shaderWrite])!
     private var outputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .bgra8Unorm, usage: [.shaderRead, .shaderWrite])!
+
+    private var a = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .bgra8Unorm, usage: [.shaderRead, .shaderWrite])!
+    var styleInputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .rgba32Float, usage: [.shaderRead, .shaderWrite])!
+    private var styleArray: MLMultiArray?
 
     var textureCache: CVMetalTextureCache!
 
@@ -26,12 +37,16 @@ class Processor {
         CVMetalTextureCacheCreate(kCFAllocatorDefault, nil, GPU.device, nil, &textureCache)
     }
 
+    deinit {
+        CVMetalTextureCacheFlush(textureCache, 0)
+    }
+
     func process(sampleBuffer: CMSampleBuffer) -> CIImage? {
         guard let mtlTexture = getTexture(from: sampleBuffer),
               (try? mtlTexture.convert(into: modelInputBuffer.texture)) != nil,
               let input = modelInputBuffer.mlmultiarray,
               let latent = encode(input),
-              let output = decode(latent)
+              let output = decode(content: latent, style: styleArray)
         else {
             return nil
         }
@@ -43,7 +58,7 @@ class Processor {
             return nil
         }
 
-        return CIImage(mtlTexture: outputBuffer.texture)
+        return CIImage(mtlTexture: outputBuffer.texture)?.oriented(.upMirrored)
     }
 
     func getTexture(from sampleBuffer: CMSampleBuffer) -> MTLTexture? {
@@ -78,11 +93,49 @@ class Processor {
         return mtlTexture
     }
 
-    func encode(_ input: MLMultiArray) -> MLMultiArray? {
-        try? encoder.prediction(input: adain_vggInput(x: input)).var_171
+    func encode(style: UIImage) {
+//        let ciImage: CIImage
+//        if let image = style.ciImage {
+//            ciImage = image
+//        } else if let image = style.cgImage {
+//            ciImage = CIImage(cgImage: image)
+//        } else {
+//            return
+//        }
+        guard let cgImage = style.cgImage
+        else {
+            return
+        }
+
+        guard let texture = try? loader.newTexture(cgImage: cgImage)
+        else {
+            return
+        }
+
+        guard let commandBuffer = GPU.queue.makeCommandBuffer()
+        else {
+            return
+        }
+
+        guard (try? texture.convert(into: styleInputBuffer.texture)) != nil
+        else {
+            return
+        }
+
+        guard let mlmultiarray = styleInputBuffer.mlmultiarray,
+              let style = encode(mlmultiarray)
+        else {
+            return
+        }
+
+        self.styleArray = style
     }
 
-    func decode(_ input: MLMultiArray) -> MLMultiArray? {
-        try? decoder.prediction(input: adain_decInput(x: input)).var_138
+    func encode(_ input: MLMultiArray) -> MLMultiArray? {
+        try? encoder.prediction(x: input).var_171
+    }
+
+    func decode(content: MLMultiArray, style: MLMultiArray? = nil) -> MLMultiArray? {
+        try? decoder.prediction(content: content, style: style ?? content).var_291
     }
 }
