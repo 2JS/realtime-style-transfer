@@ -4,6 +4,7 @@ from pathlib import Path
 import torch
 import torch.nn as nn
 import coremltools as ct
+from coremltools.models.neural_network.quantization_utils import quantize_weights
 
 import net
 from function import adaptive_instance_normalization as adain
@@ -58,6 +59,7 @@ converted_vgg  = ct.convert(
     source='pytorch',
     inputs = [ct.TensorType(shape=sample_input.shape)]
 )
+converted_vgg = quantize_weights(converted_vgg, nbits=16)
 
 converted_vgg.save("adain_vgg.mlmodel")
 
@@ -69,4 +71,5 @@ converted_decoder = ct.convert(
     source='pytorch',
     inputs = [ct.TensorType(shape=sample_latent.shape), ct.TensorType(shape=sample_latent.shape)]
 )
+converted_decoder = quantize_weights(converted_decoder, nbits=16)
 converted_decoder.save("adain_dec.mlmodel")
