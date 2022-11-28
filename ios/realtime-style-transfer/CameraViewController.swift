@@ -124,8 +124,12 @@ class CameraViewController: UIViewController {
         session.beginConfiguration()
         defer { session.commitConfiguration() }
 
-        guard let videoDevice = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .unspecified)
-        else { return }
+        guard let videoDevice: AVCaptureDevice =
+            AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .unspecified) ??
+            AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .unspecified)
+        else {
+            return
+        }
 
         guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice),
               session.canAddInput(videoDeviceInput)
