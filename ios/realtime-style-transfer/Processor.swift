@@ -57,7 +57,13 @@ class Processor {
             return nil
         }
 
-        return CIImage(mtlTexture: outputBuffer.texture)?.oriented(.upMirrored)
+        let orientation: CGImagePropertyOrientation
+        if ProcessInfo().isiOSAppOnMac {
+            orientation = .up
+        } else {
+            orientation = .upMirrored
+        }
+        return CIImage(mtlTexture: outputBuffer.texture)?.oriented(orientation)
     }
 
     func getTexture(from sampleBuffer: CMSampleBuffer) -> MTLTexture? {
