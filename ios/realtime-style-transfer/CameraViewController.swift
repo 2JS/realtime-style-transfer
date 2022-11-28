@@ -213,7 +213,6 @@ extension CameraViewController: PHPickerViewControllerDelegate {
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = self
         present(picker, animated: true)
-        session.stopRunning()
     }
 
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
@@ -225,13 +224,11 @@ extension CameraViewController: PHPickerViewControllerDelegate {
         }
 
         if itemProvider.canLoadObject(ofClass: UIImage.self) {
-            itemProvider.loadObject(ofClass: UIImage.self) { [weak self] photo, error in
+            itemProvider.loadObject(ofClass: UIImage.self) { photo, error in
                 guard let image = photo as? UIImage
                 else { return }
 
                 Processor.shared.encode(style: image)
-
-                self?.session.startRunning()
             }
         }
     }
