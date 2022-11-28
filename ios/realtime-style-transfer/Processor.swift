@@ -12,7 +12,7 @@ class Processor {
     static let shared = Processor()
 
     private let encoder = try! adain_vgg(configuration: MLModelConfiguration().then {
-        $0.computeUnits = .all
+        $0.computeUnits = .cpuAndGPU
         $0.allowLowPrecisionAccumulationOnGPU = true
     })
 
@@ -27,7 +27,6 @@ class Processor {
     private var modelOutputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .rgba32Float, usage: [.shaderRead, .shaderWrite])!
     private var outputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .bgra8Unorm, usage: [.shaderRead, .shaderWrite])!
 
-    private var a = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .bgra8Unorm, usage: [.shaderRead, .shaderWrite])!
     var styleInputBuffer = TextureBuffer(device: GPU.device, height: 640, width: 480, pixelFormat: .rgba32Float, usage: [.shaderRead, .shaderWrite])!
     private var styleArray: MLMultiArray?
 
@@ -94,25 +93,37 @@ class Processor {
     }
 
     func encode(style: UIImage) {
-//        let ciImage: CIImage
-//        if let image = style.ciImage {
-//            ciImage = image
-//        } else if let image = style.cgImage {
-//            ciImage = CIImage(cgImage: image)
-//        } else {
-//            return
-//        }
         guard let cgImage = style.cgImage
         else {
             return
         }
 
-        guard let texture = try? loader.newTexture(cgImage: cgImage)
+        let bytesPerPixel = cgImage.bitsPerPixel / cgImage.bitsPerComponent
+        let destBytesPerRow = width * bytesPerPixel
+
+        guard let colorspace = CGColorSpace(name: CGColorSpace.linearSRGB),
+              let cgContext = CGContext(
+                data: nil,
+                width: 480,
+                height: 640,
+                bitsPerComponent: cgImage.bitsPerComponent,
+                bytesPerRow: destBytesPerRow,
+                space: colorspace,
+                bitmapInfo: cgImage.alphaInfo.rawValue
+              )
         else {
             return
         }
 
-        guard let commandBuffer = GPU.queue.makeCommandBuffer()
+        cgContext.interpolationQuality = .default
+        cgContext.draw(cgImage, in: CGRect(x: 0, y: 0, width: 480, height: 640))
+
+        guard let cgImage = cgContext.makeImage()
+        else {
+            return
+        }
+
+        guard let texture = try? loader.newTexture(cgImage: cgImage)
         else {
             return
         }
@@ -129,6 +140,10 @@ class Processor {
         }
 
         self.styleArray = style
+    }
+
+    func discardStyle() {
+        self.styleArray = nil
     }
 
     func encode(_ input: MLMultiArray) -> MLMultiArray? {

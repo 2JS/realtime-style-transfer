@@ -493,6 +493,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "realtime-style-transfer/Info.plist";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Give me vision";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Let me save it";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -524,6 +525,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "realtime-style-transfer/Info.plist";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Give me vision";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Let me save it";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

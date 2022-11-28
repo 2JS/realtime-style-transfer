@@ -20,9 +20,29 @@ class CameraViewController: UIViewController {
         $0.layer.masksToBounds = true
     }
 
-    private lazy var stack = UIStackView(arrangedSubviews: [photoPickerButton]).then {
+    private lazy var resetButton = UIButton.systemButton(
+        with: UIImage(systemName: "arrow.counterclockwise")!,
+        target: self,
+        action: #selector(onResetButton)
+    ).then {
+        $0.tintColor = .white
+    }
+
+    private lazy var shareButton = UIButton.systemButton(
+        with: UIImage(systemName: "square.and.arrow.up")!,
+        target: self,
+        action: #selector(onShareButton)
+    ).then {
+        $0.tintColor = .white
+    }
+
+    private lazy var stack = UIStackView(arrangedSubviews: [
+        photoPickerButton,
+        resetButton,
+        shareButton
+    ]).then {
         $0.alignment = .center
-        $0.distribution = .equalCentering
+        $0.distribution = .fillEqually
     }
 
     override func viewDidLoad() {
@@ -158,6 +178,31 @@ class CameraViewController: UIViewController {
     }
 
     @objc
+    func onShareButton() {
+        guard let image = transferredView.image
+        else {
+            return
+        }
+
+        transferredView.alpha = 0
+        UIView.animate(withDuration: 0.3) {
+            self.transferredView.alpha = 1
+        }
+
+        self.present(
+            UIActivityViewController(activityItems: [image], applicationActivities: nil),
+            animated: true
+        )
+    }
+
+    @objc
+    func onResetButton() {
+        Processor.shared.discardStyle()
+    }
+}
+
+extension CameraViewController: PHPickerViewControllerDelegate {
+    @objc
     func onPhotoPickerButton() {
         var config = PHPickerConfiguration(photoLibrary: .shared())
         config.filter = PHPickerFilter.any(of: [.images, .livePhotos])
@@ -168,10 +213,9 @@ class CameraViewController: UIViewController {
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = self
         present(picker, animated: true)
+        session.stopRunning()
     }
-}
 
-extension CameraViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         dismiss(animated: true)
 
@@ -187,13 +231,7 @@ extension CameraViewController: PHPickerViewControllerDelegate {
 
                 Processor.shared.encode(style: image)
 
-//                DispatchQueue.main.async {
-//                    self?.transferredView.image = UIImage(ciImage: CIImage(mtlTexture: Processor.shared.styleInputBuffer.texture)!)
-//                }
-//                DispatchQueue.main.async {
-//                    self?.transferredView.image = image
-//                }
-
+                self?.session.startRunning()
             }
         }
     }
