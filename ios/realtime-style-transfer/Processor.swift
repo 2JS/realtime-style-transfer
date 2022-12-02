@@ -98,51 +98,18 @@ class Processor {
         return mtlTexture
     }
 
-    func encode(style: UIImage) {
-        guard let cgImage = style.cgImage
+    func encode(style: UIImage) throws {
+        guard let texture = (try? texture(cgImageOf: style)) ?? (try? texture(pngOf: style))
         else {
-            return
+            throw GPUError.generic
         }
 
-        let bytesPerPixel = cgImage.bitsPerPixel / cgImage.bitsPerComponent
-        let destBytesPerRow = width * bytesPerPixel
-
-        guard let colorspace = CGColorSpace(name: CGColorSpace.linearSRGB),
-              let cgContext = CGContext(
-                data: nil,
-                width: 480,
-                height: 640,
-                bitsPerComponent: cgImage.bitsPerComponent,
-                bytesPerRow: destBytesPerRow,
-                space: colorspace,
-                bitmapInfo: cgImage.alphaInfo.rawValue
-              )
-        else {
-            return
-        }
-
-        cgContext.interpolationQuality = .default
-        cgContext.draw(cgImage, in: CGRect(x: 0, y: 0, width: 480, height: 640))
-
-        guard let cgImage = cgContext.makeImage()
-        else {
-            return
-        }
-
-        guard let texture = try? loader.newTexture(cgImage: cgImage)
-        else {
-            return
-        }
-
-        guard (try? texture.convert(into: styleInputBuffer.texture)) != nil
-        else {
-            return
-        }
+        try texture.convert(into: styleInputBuffer.texture)
 
         guard let mlmultiarray = styleInputBuffer.mlmultiarray,
               let style = encode(mlmultiarray)
         else {
-            return
+            throw GPUError.generic
         }
 
         self.styleArray = style
@@ -158,5 +125,51 @@ class Processor {
 
     func decode(content: MLMultiArray, style: MLMultiArray? = nil) -> MLMultiArray? {
         try? decoder.prediction(content: content, style: style ?? content).var_291
+    }
+
+    func texture(cgImageOf image: UIImage) throws -> MTLTexture {
+        guard let cgImage = image.cgImage
+        else {
+            throw GPUError.generic
+        }
+
+        let bytesPerPixel = cgImage.bitsPerPixel / cgImage.bitsPerComponent
+        let destBytesPerRow = width * bytesPerPixel
+
+        guard let colorspace = CGColorSpace(name: CGColorSpace.linearSRGB)
+        else {
+            throw GPUError.generic
+        }
+        guard
+              let cgContext = CGContext(
+                data: nil,
+                width: 480,
+                height: 640,
+                bitsPerComponent: cgImage.bitsPerComponent,
+                bytesPerRow: destBytesPerRow,
+                space: colorspace,
+                bitmapInfo: cgImage.alphaInfo.rawValue
+              )
+        else {
+            throw GPUError.generic
+        }
+
+        cgContext.interpolationQuality = .default
+        cgContext.draw(cgImage, in: CGRect(x: 0, y: 0, width: 480, height: 640))
+
+        guard let cgImage = cgContext.makeImage()
+        else {
+            throw GPUError.generic
+        }
+
+        return try loader.newTexture(cgImage: cgImage)
+    }
+
+    func texture(pngOf image: UIImage) throws -> MTLTexture {
+        guard let data = image.pngData()
+        else {
+            throw GPUError.generic
+        }
+        return try loader.newTexture(data: data)
     }
 }

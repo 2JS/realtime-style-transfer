@@ -48,7 +48,7 @@ extension MTLTexture {
     }
 
     func converted(pixelFormat: MTLPixelFormat) -> MTLTexture? {
-        guard let colorspace = CGColorSpace(name: CGColorSpace.linearSRGB),
+        guard let colorspace = CGColorSpace(name: CGColorSpace.sRGB),
               let commandBuffer = GPU.queue.makeCommandBuffer(),
               let destTexture = Self.new_like(self, pixelFormat: pixelFormat, usage: [self.usage, .shaderRead, .shaderWrite])
         else {
@@ -78,7 +78,7 @@ extension MTLTexture {
     }
 
     func convert(into: MTLTexture) throws {
-        guard let colorspace = CGColorSpace(name: CGColorSpace.linearSRGB),
+        guard let colorspace = CGColorSpace(name: CGColorSpace.sRGB),
               let commandBuffer = GPU.queue.makeCommandBuffer()
         else {
             throw GPUError.generic

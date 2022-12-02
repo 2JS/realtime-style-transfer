@@ -226,9 +226,15 @@ extension CameraViewController: PHPickerViewControllerDelegate {
         if itemProvider.canLoadObject(ofClass: UIImage.self) {
             itemProvider.loadObject(ofClass: UIImage.self) { photo, error in
                 guard let image = photo as? UIImage
-                else { return }
+                else {
+                    return
+                }
 
-                Processor.shared.encode(style: image)
+                do {
+                    try Processor.shared.encode(style: image)
+                } catch {
+
+                }
             }
         }
     }
