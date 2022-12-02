@@ -21,7 +21,7 @@ class CameraViewController: UIViewController {
     }
 
     private lazy var resetButton = UIButton.systemButton(
-        with: UIImage(systemName: "arrow.counterclockwise")!,
+        with: UIImage(systemName: "xmark.bin")!,
         target: self,
         action: #selector(onResetButton)
     ).then {
