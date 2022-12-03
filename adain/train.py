@@ -165,8 +165,8 @@ for i in tqdm(range(args.max_iter)):
     if (i) % args.save_model_interval == 0 or (i) == args.max_iter:
         print(f'Epoch {i} || train loss = {loss:.4f}')
         print(f'Epoch {i} || valid loss = {loss_valid:.4f}')
-        state_dict_d = net.decoder.to(torch.device('cpu')).state_dict()
-        state_dict_e = net.vgg.to(torch.device('cpu')).state_dict()
+        state_dict_d = network.decoder.to(torch.device('cpu')).state_dict()
+        state_dict_e = network.vgg.to(torch.device('cpu')).state_dict()
         #for key in state_dict_d.keys():
         #    state_dict_d[key] = state_dict_d[key].to(torch.device('cpu'))
         #for key in state_dict_e.keys():
