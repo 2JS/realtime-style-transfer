@@ -69,7 +69,7 @@ converted_vgg  = ct.convert(
     # inputs = [ct.TensorType(shape=sample_input.shape)]
     inputs = [ct.ImageType(shape=sample_input.shape, bias=[-103.9390/255, -116.7790/255, -123.6800/255], color_layout=ct.colorlayout.BGR)]
 )
-# converted_vgg = quantize_weights(converted_vgg, nbits=16)
+converted_vgg = quantize_weights(converted_vgg, nbits=16)
 
 converted_vgg.save("adain_vgg.mlmodel")
 
@@ -82,5 +82,5 @@ converted_decoder = ct.convert(
     inputs = [ct.TensorType(shape=sample_latent.shape), ct.TensorType(shape=sample_latent.shape)],
     outputs=[ct.ImageType(color_layout=ct.colorlayout.RGB)]
 )
-# converted_decoder = quantize_weights(converted_decoder, nbits=16)
+converted_decoder = quantize_weights(converted_decoder, nbits=16)
 converted_decoder.save("adain_dec.mlmodel")
