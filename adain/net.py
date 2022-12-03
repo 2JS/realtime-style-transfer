@@ -1,9 +1,42 @@
+import torch
 import torch.nn as nn
 
 from function import adaptive_instance_normalization as adain
 from function import calc_mean_std
 
 decoder = nn.Sequential(
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(256, 128, (3, 3)),
+    nn.ReLU(),
+    nn.Upsample(scale_factor=2, mode='nearest'),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(128, 128, (3, 3)),
+    nn.ReLU(),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(128, 128, (3, 3)),
+    nn.ReLU(),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(128, 128, (3, 3)),
+    nn.ReLU(),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(128, 64, (3, 3)),
+    nn.ReLU(),
+    nn.Upsample(scale_factor=2, mode='nearest'),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(64, 64, (3, 3)),
+    nn.ReLU(),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(64, 32, (3, 3)),
+    nn.ReLU(),
+    nn.Upsample(scale_factor=2, mode='nearest'),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(32, 32, (3, 3)),
+    nn.ReLU(),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(32, 3, (3, 3)),
+)
+
+decoder2 = nn.Sequential(
     nn.ReflectionPad2d((1, 1, 1, 1)),
     nn.Conv2d(256, 128, (3, 3)),
     nn.ReLU(),
@@ -91,7 +124,7 @@ vgg = nn.Sequential(
 
 
 class Net(nn.Module):
-    def __init__(self, encoder, decoder):
+    def __init__(self, encoder, decoder, decoder_auto):
         super(Net, self).__init__()
         enc_layers = list(encoder.children())
         self.enc_1 = nn.Sequential(*enc_layers[:2])  # input -> relu1_1
@@ -99,6 +132,7 @@ class Net(nn.Module):
         self.enc_3 = nn.Sequential(*enc_layers[9:16])  # relu2_1 -> relu3_1
         self.enc_4 = nn.Sequential(*enc_layers[16:29])  # relu3_1 -> relu4_1
         self.decoder = decoder
+        self.decoder_auto = decoder_auto
         self.mse_loss = nn.MSELoss()
 
         # fix the encoder
@@ -135,15 +169,16 @@ class Net(nn.Module):
 
     def forward(self, content, style, alpha=1.0):
         assert 0 <= alpha <= 1
-        style_feats = self.encode_with_intermediate(style)
-        content_feat = self.encode(content)
+        with torch.no_grad():
+            style_feats = self.encode_with_intermediate(style)
+            content_feat = self.encode(content)
         t = adain(content_feat, style_feats[-1])
         t = alpha * t + (1 - alpha) * content_feat
 
         g_t = self.decoder(t)
         g_t_feats = self.encode_with_intermediate(g_t)
 
-        loss_i = self.mse_loss(self.decoder(content_feat), content)
+        loss_i = self.mse_loss(self.decoder_auto(content_feat), content)
 
         loss_c = self.calc_content_loss(g_t_feats[-1], t)
         loss_s = self.calc_style_loss(g_t_feats[0], style_feats[0])

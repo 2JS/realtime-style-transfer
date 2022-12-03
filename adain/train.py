@@ -86,11 +86,12 @@ log_dir.mkdir(exist_ok=True, parents=True)
 writer = SummaryWriter(log_dir=str(log_dir))
 
 decoder = net.decoder
+decoder_auto = net.decoder2
 vgg = net.vgg
 
 # vgg.load_state_dict(torch.load(args.vgg))
-vgg = nn.Sequential(*list(vgg.children())[:31])
-network = net.Net(vgg, decoder)
+vgg = nn.Sequential(*list(vgg.children())[:29])
+network = net.Net(vgg, decoder, decoder_auto)
 network.train()
 network.to(device)
 
