@@ -162,19 +162,19 @@ for i in tqdm(range(args.max_iter)):
         writer.add_scalar('valid_content', loss_c_valid.item(), i+1)
         writer.add_scalar('valid_style', loss_s_valid.item(), i+1)
         
-    if (i + 1) % args.save_model_interval == 0 or (i + 1) == args.max_iter:
+    if (i) % args.save_model_interval == 0 or (i) == args.max_iter:
         print(f'Epoch {i} || train loss = {loss:.4f}')
         print(f'Epoch {i} || valid loss = {loss_valid:.4f}')
-        state_dict_d = net.decoder.state_dict()
-        state_dict_e = net.vgg.state_dict()
-        for key in state_dict_d.keys():
-            state_dict_d[key] = state_dict_d[key].to(torch.device('cpu'))
-        for key in state_dict_e.keys():
-            state_dict_e[key] = state_dict_d[key].to(torch.device('cpu'))
-        torch.save(g_t, save_dir / 'iter_{:d}.jpg'.format(i + 1))
-        torch.save(g_t_valid, save_dir / 'iter_{:d}.jpg'.format(i + 1))
+        state_dict_d = net.decoder.to(torch.device('cpu')).state_dict()
+        state_dict_e = net.vgg.to(torch.device('cpu')).state_dict()
+        #for key in state_dict_d.keys():
+        #    state_dict_d[key] = state_dict_d[key].to(torch.device('cpu'))
+        #for key in state_dict_e.keys():
+        #    state_dict_e[key] = state_dict_d[key].to(torch.device('cpu'))
+        torch.save(g_t, save_dir / 'iter_{:d}.jpg'.format(i))
+        torch.save(g_t_valid, save_dir / 'iter_{:d}.jpg'.format(i))
         torch.save(state_dict_d, save_dir /
-                   'decoder_iter_{:d}.pth'.format(i + 1))
+                   'decoder_iter_{:d}.pth'.format(i))
         torch.save(state_dict_e, save_dir /
-                   'encoder_iter_{:d}.pth'.format(i + 1))
+                   'encoder_iter_{:d}.pth'.format(i))
 writer.close()
