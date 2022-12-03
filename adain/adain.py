@@ -47,10 +47,17 @@ class Decoder(nn.Module):
 encoder = Encoder()
 encoder.vgg.load_state_dict(torch.load('models/vgg_normalised.pth'))
 # encoder.net[0].weight = nn.Parameter(encoder.net[0].weight * 255)
+for layer in encoder.net.children():
+    if "bias" in dir(layer):
+        layer.bias = nn.Parameter(layer.bias / 255)
 # encoder = encoder.to(memory_format=torch.channels_last)
 
 decoder = Decoder()
 decoder.net.load_state_dict(torch.load('models/decoder.pth'))
+for layer in list(decoder.net.children())[:-1]:
+    if "bias" in dir(layer):
+        layer.bias = nn.Parameter(layer.bias / 255)
+decoder.net[-1].weight = nn.Parameter(decoder.net[-1].weight * 255)
 # decoder = decoder.to(memory_format=torch.channels_last)
 
 sample_input = torch.rand(1, 3, 640, 480)
@@ -60,7 +67,7 @@ converted_vgg  = ct.convert(
     traced_vgg,
     source='pytorch',
     # inputs = [ct.TensorType(shape=sample_input.shape)]
-    inputs = [ct.ImageType(shape=sample_input.shape, scale=255, bias=[-103.9390, -116.7790, -123.6800], color_layout=ct.colorlayout.BGR)]
+    inputs = [ct.ImageType(shape=sample_input.shape, bias=[-103.9390/255, -116.7790/255, -123.6800/255], color_layout=ct.colorlayout.BGR)]
 )
 # converted_vgg = quantize_weights(converted_vgg, nbits=16)
 
