@@ -5,22 +5,15 @@ from function import calc_mean_std
 
 decoder = nn.Sequential(
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(512, 256, (3, 3)),
-    nn.ReLU(),
-    nn.Upsample(scale_factor=2, mode='nearest'),
-    nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(256, 256, (3, 3)),
-    nn.ReLU(),
-    nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(256, 256, (3, 3)),
-    nn.ReLU(),
-    nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(256, 256, (3, 3)),
-    nn.ReLU(),
-    nn.ReflectionPad2d((1, 1, 1, 1)),
     nn.Conv2d(256, 128, (3, 3)),
     nn.ReLU(),
     nn.Upsample(scale_factor=2, mode='nearest'),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(128, 128, (3, 3)),
+    nn.ReLU(),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(128, 128, (3, 3)),
+    nn.ReLU(),
     nn.ReflectionPad2d((1, 1, 1, 1)),
     nn.Conv2d(128, 128, (3, 3)),
     nn.ReLU(),
@@ -32,43 +25,48 @@ decoder = nn.Sequential(
     nn.Conv2d(64, 64, (3, 3)),
     nn.ReLU(),
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(64, 3, (3, 3)),
+    nn.Conv2d(64, 32, (3, 3)),
+    nn.ReLU(),
+    nn.Upsample(scale_factor=2, mode='nearest'),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(32, 32, (3, 3)),
+    nn.ReLU(),
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(32, 3, (3, 3)),
 )
 
 vgg = nn.Sequential(
-    nn.Conv2d(3, 3, (1, 1)),
-    nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(3, 64, (3, 3)),
+    nn.Conv2d(3, 32, (3, 3)),
     nn.ReLU(),  # relu1-1
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(64, 64, (3, 3)),
+    nn.Conv2d(32, 32, (3, 3)),
     nn.ReLU(),  # relu1-2
     nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(64, 128, (3, 3)),
+    nn.Conv2d(32, 64, (3, 3)),
     nn.ReLU(),  # relu2-1
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(128, 128, (3, 3)),
+    nn.Conv2d(64, 64, (3, 3)),
     nn.ReLU(),  # relu2-2
     nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(128, 256, (3, 3)),
+    nn.Conv2d(64, 128, (3, 3)),
     nn.ReLU(),  # relu3-1
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(256, 256, (3, 3)),
+    nn.Conv2d(128, 128, (3, 3)),
     nn.ReLU(),  # relu3-2
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(256, 256, (3, 3)),
+    nn.Conv2d(128, 128, (3, 3)),
     nn.ReLU(),  # relu3-3
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(256, 256, (3, 3)),
+    nn.Conv2d(128, 128, (3, 3)),
     nn.ReLU(),  # relu3-4
     nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(256, 512, (3, 3)),
+    nn.Conv2d(128, 256, (3, 3)),
     nn.ReLU(),  # relu4-1, this is the last layer used
     nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(512, 512, (3, 3)),
+    nn.Conv2d(256, 512, (3, 3)),
     nn.ReLU(),  # relu4-2
     nn.ReflectionPad2d((1, 1, 1, 1)),
     nn.Conv2d(512, 512, (3, 3)),
@@ -96,10 +94,10 @@ class Net(nn.Module):
     def __init__(self, encoder, decoder):
         super(Net, self).__init__()
         enc_layers = list(encoder.children())
-        self.enc_1 = nn.Sequential(*enc_layers[:4])  # input -> relu1_1
-        self.enc_2 = nn.Sequential(*enc_layers[4:11])  # relu1_1 -> relu2_1
-        self.enc_3 = nn.Sequential(*enc_layers[11:18])  # relu2_1 -> relu3_1
-        self.enc_4 = nn.Sequential(*enc_layers[18:31])  # relu3_1 -> relu4_1
+        self.enc_1 = nn.Sequential(*enc_layers[:2])  # input -> relu1_1
+        self.enc_2 = nn.Sequential(*enc_layers[2:9])  # relu1_1 -> relu2_1
+        self.enc_3 = nn.Sequential(*enc_layers[9:16])  # relu2_1 -> relu3_1
+        self.enc_4 = nn.Sequential(*enc_layers[16:29])  # relu3_1 -> relu4_1
         self.decoder = decoder
         self.mse_loss = nn.MSELoss()
 
