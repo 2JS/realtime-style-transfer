@@ -492,12 +492,15 @@
 				DEVELOPMENT_TEAM = 72PN2F2N93;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "realtime-style-transfer/Info.plist";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Give me vision";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Realtime Style Transfer will change the style of camera input and show it back to you.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need Photos Library permission to save the captured image.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "iphone-ipad-minimum-performance-a12 video-camera metal";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -522,12 +525,15 @@
 				DEVELOPMENT_TEAM = 72PN2F2N93;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "realtime-style-transfer/Info.plist";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Give me vision";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Realtime Style Transfer will change the style of camera input and show it back to you.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need Photos Library permission to save the captured image.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "iphone-ipad-minimum-performance-a12 video-camera metal";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

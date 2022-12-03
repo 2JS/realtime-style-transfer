@@ -4,9 +4,10 @@ from pathlib import Path
 import torch
 import torch.nn as nn
 import coremltools as ct
+from coremltools.models.neural_network.quantization_utils import quantize_weights
 
 import net
-from function import adaptive_instance_normalization, coral
+from function import adaptive_instance_normalization as adain
 
 decoder = net.decoder
 vgg = net.vgg
@@ -29,8 +30,9 @@ class Decoder(nn.Module):
         super(Decoder, self).__init__()
         self.net = net.decoder
 
-    def forward(self, x):
-        y = self.net(x)
+    def forward(self, content, style):
+        out = adain(content, style)
+        y = self.net(out)
         _, _, h, w = y.shape
         return torch.cat([y, torch.zeros(1, 1, h, w)], axis=1).permute(0, 2, 3, 1)
 
@@ -55,17 +57,19 @@ latent = traced_vgg(sample_input)
 converted_vgg  = ct.convert(
     traced_vgg,
     source='pytorch',
-    inputs = [ct.TensorType(shape=(1, 640, 480, 4))]
+    inputs = [ct.TensorType(shape=sample_input.shape)]
 )
+converted_vgg = quantize_weights(converted_vgg, nbits=16)
 
 converted_vgg.save("adain_vgg.mlmodel")
 
 sample_latent = torch.rand_like(latent)
-traced_decoder = torch.jit.trace(decoder, sample_latent)
-out = traced_decoder(sample_latent)
+traced_decoder = torch.jit.trace(decoder, (sample_latent, sample_latent))
+out = traced_decoder(sample_latent, sample_latent)
 converted_decoder = ct.convert(
     traced_decoder,
     source='pytorch',
-    inputs = [ct.TensorType(shape=(1, 512, 80, 60))]
+    inputs = [ct.TensorType(shape=sample_latent.shape), ct.TensorType(shape=sample_latent.shape)]
 )
+converted_decoder = quantize_weights(converted_decoder, nbits=16)
 converted_decoder.save("adain_dec.mlmodel")
