@@ -120,7 +120,7 @@ vgg.eval()
 
 decoder.load_state_dict(torch.load(args.decoder))
 vgg.load_state_dict(torch.load(args.vgg))
-vgg = nn.Sequential(*list(vgg.children())[:31])
+vgg = nn.Sequential(*list(vgg.children())[:29])
 
 vgg.to(device)
 decoder.to(device)
