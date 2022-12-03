@@ -57,15 +57,15 @@ class CameraViewController: UIViewController {
         setupSession()
 
         videoStream.publisher
-            .throttle(for: 0.2, scheduler: RunLoop.current, latest: true)
+            .throttle(for: 0.3, scheduler: RunLoop.current, latest: true)
             .sink { [unowned self] (sampleBuffer) -> Void in
-                let start = CFAbsoluteTimeGetCurrent()
+//                let start = CFAbsoluteTimeGetCurrent()
                 guard let ciImage =  Processor.shared.process(sampleBuffer: sampleBuffer)
                 else {
                     return
                 }
-                let duration = CFAbsoluteTimeGetCurrent() - start
-                print(duration)
+//                let duration = CFAbsoluteTimeGetCurrent() - start
+//                print(duration)
 
                 let uiImage = UIImage(ciImage: ciImage)
 

@@ -10,6 +10,8 @@
 		75195FCC2919567D0057AF82 /* VideoStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75195FCB2919567D0057AF82 /* VideoStream.swift */; };
 		75892D9429194550002D625E /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75892D9329194550002D625E /* CameraViewController.swift */; };
 		75892D962919466B002D625E /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75892D952919466B002D625E /* PreviewView.swift */; };
+		75A86E2A293B24EE0048306C /* MTLTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A86E29293B24EE0048306C /* MTLTexture.swift */; };
+		75A86E2C293B26720048306C /* CVBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A86E2B293B26720048306C /* CVBuffer.swift */; };
 		75B78F6828DF4C290026FEA3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B78F6728DF4C290026FEA3 /* AppDelegate.swift */; };
 		75B78F6A28DF4C290026FEA3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B78F6928DF4C290026FEA3 /* SceneDelegate.swift */; };
 		75B78F6C28DF4C290026FEA3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B78F6B28DF4C290026FEA3 /* ViewController.swift */; };
@@ -51,6 +53,8 @@
 		75195FCB2919567D0057AF82 /* VideoStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoStream.swift; sourceTree = "<group>"; };
 		75892D9329194550002D625E /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 		75892D952919466B002D625E /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
+		75A86E29293B24EE0048306C /* MTLTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTLTexture.swift; sourceTree = "<group>"; };
+		75A86E2B293B26720048306C /* CVBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVBuffer.swift; sourceTree = "<group>"; };
 		75B78F6428DF4C290026FEA3 /* realtime-style-transfer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "realtime-style-transfer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		75B78F6728DF4C290026FEA3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		75B78F6928DF4C290026FEA3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -132,8 +136,10 @@
 				75E9F07E2924D6F5004DB366 /* GPU.swift */,
 				75E3986928ED9D450067469F /* Log.swift */,
 				75E9F08029250114004DB366 /* MTLPixelFormat.swift */,
+				75A86E29293B24EE0048306C /* MTLTexture.swift */,
 				75892D952919466B002D625E /* PreviewView.swift */,
 				75D48CAF292644910021A4F8 /* Processor.swift */,
+				75A86E2B293B26720048306C /* CVBuffer.swift */,
 				75B78F6928DF4C290026FEA3 /* SceneDelegate.swift */,
 				75BEDA2129260628002F4DAE /* TextureBuffer.swift */,
 				75195FCB2919567D0057AF82 /* VideoStream.swift */,
@@ -301,6 +307,7 @@
 			files = (
 				75B78F6C28DF4C290026FEA3 /* ViewController.swift in Sources */,
 				75E9F08129250114004DB366 /* MTLPixelFormat.swift in Sources */,
+				75A86E2A293B24EE0048306C /* MTLTexture.swift in Sources */,
 				75F5A19B291A85C100786128 /* adain_dec.mlmodel in Sources */,
 				75195FCC2919567D0057AF82 /* VideoStream.swift in Sources */,
 				75E9F07F2924D6F5004DB366 /* GPU.swift in Sources */,
@@ -310,6 +317,7 @@
 				75892D9429194550002D625E /* CameraViewController.swift in Sources */,
 				75BEDA2229260628002F4DAE /* TextureBuffer.swift in Sources */,
 				75E9F083292503CF004DB366 /* BinaryInteger.swift in Sources */,
+				75A86E2C293B26720048306C /* CVBuffer.swift in Sources */,
 				75E9F08529251513004DB366 /* adain_vgg.mlmodel in Sources */,
 				75B78F6828DF4C290026FEA3 /* AppDelegate.swift in Sources */,
 				75B78F6A28DF4C290026FEA3 /* SceneDelegate.swift in Sources */,
@@ -501,7 +509,7 @@
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "iphone-ipad-minimum-performance-a12 video-camera metal";
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -534,7 +542,7 @@
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "iphone-ipad-minimum-performance-a12 video-camera metal";
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

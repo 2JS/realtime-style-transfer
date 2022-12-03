@@ -13,12 +13,12 @@ class Processor {
 
     private let encoder = try! adain_vgg(configuration: MLModelConfiguration().then {
         $0.computeUnits = .cpuAndGPU
-        $0.allowLowPrecisionAccumulationOnGPU = true
+//        $0.allowLowPrecisionAccumulationOnGPU = true
     })
 
     private let decoder = try! adain_dec(configuration: MLModelConfiguration().then {
-        $0.computeUnits = .all
-        $0.allowLowPrecisionAccumulationOnGPU = true
+        $0.computeUnits = .cpuAndGPU
+//        $0.allowLowPrecisionAccumulationOnGPU = true
     })
 
     private let loader = MTKTextureLoader(device: GPU.device)
@@ -41,29 +41,34 @@ class Processor {
     }
 
     func process(sampleBuffer: CMSampleBuffer) -> CIImage? {
-        guard let mtlTexture = getTexture(from: sampleBuffer),
-              (try? mtlTexture.convert(into: modelInputBuffer.texture)) != nil,
-              let input = modelInputBuffer.mlmultiarray,
+        guard //let mtlTexture = getTexture(from: sampleBuffer),
+//              (try? mtlTexture.convert(into: modelInputBuffer.texture)) != nil,
+//              let input = modelInputBuffer.mlmultiarray,
+//              let input = modelInputBuffer.texture.pixelBuffer,
+              let input = CMSampleBufferGetImageBuffer(sampleBuffer),
               let latent = encode(input),
               let output = decode(content: latent, style: styleArray)
         else {
             return nil
         }
 
-        modelOutputBuffer.mlmultiarray = output
+//        modelOutputBuffer.mlmultiarray = output
 
-        guard (try? modelOutputBuffer.texture.convert(into: outputBuffer.texture)) != nil
-        else {
-            return nil
-        }
-
+//        guard (try? modelOutputBuffer.texture.convert(into: outputBuffer.texture)) != nil
+//        else {
+//            return nil
+//        }
+//
         let orientation: CGImagePropertyOrientation
         if ProcessInfo().isiOSAppOnMac {
-            orientation = .up
+            orientation = .downMirrored
         } else {
-            orientation = .upMirrored
+            orientation = .down
         }
-        return CIImage(mtlTexture: outputBuffer.texture)?.oriented(orientation)
+//        print(CVPixelBufferGetPixelFormatType(output))
+//        print(kCVPixelFormatType_32BGRA, kCVPixelFormatType_32ARGB)
+        return CIImage(cvPixelBuffer: output).oriented(orientation)
+//        return CIImage(mtlTexture: outputBuffer.texture)?.oriented(orientation)
     }
 
     func getTexture(from sampleBuffer: CMSampleBuffer) -> MTLTexture? {
@@ -106,8 +111,9 @@ class Processor {
 
         try texture.convert(into: styleInputBuffer.texture)
 
-        guard let mlmultiarray = styleInputBuffer.mlmultiarray,
-              let style = encode(mlmultiarray)
+        guard //let pixelBuffer = styleInputBuffer.texture.pixelBuffer,
+              let cgImage = style.cgImage,
+              let style = try? encoder.prediction(input: adain_vggInput(xWith: cgImage)).var_147
         else {
             throw GPUError.generic
         }
@@ -119,12 +125,25 @@ class Processor {
         self.styleArray = nil
     }
 
-    func encode(_ input: MLMultiArray) -> MLMultiArray? {
-        try? encoder.prediction(x: input).var_171
+    func encode(_ input: CVPixelBuffer) -> MLMultiArray? {
+//        try? encoder.prediction(input: adain_vggInput(xWith: input)).var_160
+        let start = CFAbsoluteTimeGetCurrent()
+        let result = try? encoder.prediction(x: input).var_147
+
+        let duration = CFAbsoluteTimeGetCurrent() - start
+        print("encoder", duration)
+
+        return result
     }
 
-    func decode(content: MLMultiArray, style: MLMultiArray? = nil) -> MLMultiArray? {
-        try? decoder.prediction(content: content, style: style ?? content).var_291
+    func decode(content: MLMultiArray, style: MLMultiArray? = nil) -> CVPixelBuffer? {
+        let start = CFAbsoluteTimeGetCurrent()
+        let result = try? decoder.prediction(content: content, style: style ?? content).y
+
+        let duration = CFAbsoluteTimeGetCurrent() - start
+        print("decoder", duration)
+
+        return result
     }
 
     func texture(cgImageOf image: UIImage) throws -> MTLTexture {

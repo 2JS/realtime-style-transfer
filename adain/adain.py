@@ -19,10 +19,10 @@ class Encoder(nn.Module):
     def __init__(self):
         super(Encoder, self).__init__()
         self.vgg = net.vgg
-        self.net = nn.Sequential(*list(self.vgg.children())[:31])
+        self.net = nn.Sequential(*list(self.vgg.children())[2:31])
 
     def forward(self, x):
-        x = x[..., :3].permute(0, 3, 1, 2)
+        # x = x.permute(0, 3, 1, 2)
         return self.net(x)
 
 class Decoder(nn.Module):
@@ -34,7 +34,8 @@ class Decoder(nn.Module):
         out = adain(content, style)
         y = self.net(out)
         _, _, h, w = y.shape
-        return torch.cat([y, torch.zeros(1, 1, h, w)], axis=1).permute(0, 2, 3, 1)
+        # return y.permute(0, 2, 3, 1)
+        return y
 
 
 
@@ -45,21 +46,23 @@ class Decoder(nn.Module):
 
 encoder = Encoder()
 encoder.vgg.load_state_dict(torch.load('models/vgg_normalised.pth'))
+# encoder.net[0].weight = nn.Parameter(encoder.net[0].weight * 255)
 # encoder = encoder.to(memory_format=torch.channels_last)
 
 decoder = Decoder()
 decoder.net.load_state_dict(torch.load('models/decoder.pth'))
 # decoder = decoder.to(memory_format=torch.channels_last)
 
-sample_input = torch.rand(1, 640, 480, 4)
+sample_input = torch.rand(1, 3, 640, 480)
 traced_vgg = torch.jit.trace(encoder, sample_input)
 latent = traced_vgg(sample_input)
 converted_vgg  = ct.convert(
     traced_vgg,
     source='pytorch',
-    inputs = [ct.TensorType(shape=sample_input.shape)]
+    # inputs = [ct.TensorType(shape=sample_input.shape)]
+    inputs = [ct.ImageType(shape=sample_input.shape, scale=255, bias=[-103.9390, -116.7790, -123.6800], color_layout=ct.colorlayout.BGR)]
 )
-converted_vgg = quantize_weights(converted_vgg, nbits=16)
+# converted_vgg = quantize_weights(converted_vgg, nbits=16)
 
 converted_vgg.save("adain_vgg.mlmodel")
 
@@ -69,7 +72,8 @@ out = traced_decoder(sample_latent, sample_latent)
 converted_decoder = ct.convert(
     traced_decoder,
     source='pytorch',
-    inputs = [ct.TensorType(shape=sample_latent.shape), ct.TensorType(shape=sample_latent.shape)]
+    inputs = [ct.TensorType(shape=sample_latent.shape), ct.TensorType(shape=sample_latent.shape)],
+    outputs=[ct.ImageType(color_layout=ct.colorlayout.RGB)]
 )
-converted_decoder = quantize_weights(converted_decoder, nbits=16)
+# converted_decoder = quantize_weights(converted_decoder, nbits=16)
 converted_decoder.save("adain_dec.mlmodel")
