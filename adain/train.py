@@ -88,7 +88,6 @@ writer = SummaryWriter(log_dir=str(log_dir))
 decoder = net.decoder
 vgg = net.vgg
 
-vgg.load_state_dict(torch.load(args.vgg))
 vgg = nn.Sequential(*list(vgg.children())[:31])
 network = net.Net(vgg, decoder)
 network.train()
@@ -109,13 +108,13 @@ style_iter = iter(data.DataLoader(
     sampler=InfiniteSamplerWrapper(style_dataset),
     num_workers=args.n_threads))
 
-optimizer = torch.optim.Adam(network.decoder.parameters(), lr=args.lr)
+optimizer = torch.optim.Adam(network.parameters(), lr=args.lr)
 
 for i in tqdm(range(args.max_iter)):
     adjust_learning_rate(optimizer, iteration_count=i)
     content_images = next(content_iter).to(device)
     style_images = next(style_iter).to(device)
-    loss_c, loss_s = network(content_images, style_images)
+    loss_c, loss_s, g_t = network(content_images, style_images)
     loss_c = args.content_weight * loss_c
     loss_s = args.style_weight * loss_s
     loss = loss_c + loss_s
@@ -131,6 +130,7 @@ for i in tqdm(range(args.max_iter)):
         state_dict = net.decoder.state_dict()
         for key in state_dict.keys():
             state_dict[key] = state_dict[key].to(torch.device('cpu'))
+        torch.save(g_t, save_dir / 'iter_{:d}.jpg'.format(i + 1))
         torch.save(state_dict, save_dir /
                    'decoder_iter_{:d}.pth.tar'.format(i + 1))
 writer.close()
