@@ -125,6 +125,7 @@ for i in tqdm(range(args.max_iter)):
     loss.backward()
     optimizer.step()
 
+    writer.add_scalar('loss_autoencoder', loss_i.item(), i + 1)
     writer.add_scalar('loss_content', loss_c.item(), i + 1)
     writer.add_scalar('loss_style', loss_s.item(), i + 1)
     writer.add_scalar('lr', optimizer.param_groups[0]['lr'], i + 1)
