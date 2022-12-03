@@ -149,7 +149,7 @@ for i in tqdm(range(args.max_iter)):
 
     writer.add_scalar('train_content', loss_c.item(), i + 1)
     writer.add_scalar('train_style', loss_s.item(), i + 1)
-    print('Epoch {i} || train loss = {loss:.4f}')
+    
     network.eval()
     with torch.no_grad():
         content_test = next(tc_iter).to(device)
@@ -161,8 +161,10 @@ for i in tqdm(range(args.max_iter)):
 
         writer.add_scalar('valid_content', loss_c_valid.item(), i+1)
         writer.add_scalar('valid_style', loss_s_valid.item(), i+1)
-        print('Epoch {i} || valid loss = {loss_valid:.4f}')
+        
     if (i + 1) % args.save_model_interval == 0 or (i + 1) == args.max_iter:
+        print(f'Epoch {i} || train loss = {loss:.4f}')
+        print(f'Epoch {i} || valid loss = {loss_valid:.4f}')
         state_dict_d = net.decoder.state_dict()
         state_dict_e = net.vgg.state_dict()
         for key in state_dict_d.keys():
