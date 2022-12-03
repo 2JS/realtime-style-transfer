@@ -150,7 +150,7 @@ for i in tqdm(range(args.max_iter)):
     writer.add_scalar('train_content', loss_c.item(), i + 1)
     writer.add_scalar('train_style', loss_s.item(), i + 1)
     print('Epoch {i} || train loss = {loss:.4f}')
-    net.eval()
+    network.eval()
     with torch.no_grad():
         content_test = next(tc_iter).to(device)
         style_test = next(ts_iter).to(device)
