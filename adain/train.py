@@ -9,7 +9,7 @@ from PIL import Image, ImageFile
 from tensorboardX import SummaryWriter
 from torchvision import transforms
 from tqdm import tqdm
-from test import style_transfer
+#from test import style_transfer
 
 import net
 from sampler import InfiniteSamplerWrapper
