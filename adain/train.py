@@ -110,9 +110,18 @@ style_iter = iter(data.DataLoader(
     num_workers=args.n_threads))
 
 optimizer = torch.optim.AdamW(network.parameters(), lr=args.lr)
+scheduler = torch.optim.lr_scheduler.CyclicLR(
+    optimizer, 
+    base_lr=1e-5, 
+    max_lr=5e-3, 
+    gamma=0.95, 
+    step_size_up=100,
+    step_size_down=100,
+    mode='exp_range'
+)
 
 for i in tqdm(range(args.max_iter)):
-    adjust_learning_rate(optimizer, iteration_count=i)
+    # adjust_learning_rate(optimizer, iteration_count=i)
     content_images = next(content_iter).to(device)
     style_images = next(style_iter).to(device)
     loss_i, loss_c, loss_s = network(content_images, style_images)
@@ -123,6 +132,7 @@ for i in tqdm(range(args.max_iter)):
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
+    scheduler.step()
 
     writer.add_scalar('loss_content', loss_c.item(), i + 1)
     writer.add_scalar('loss_style', loss_s.item(), i + 1)
