@@ -102,9 +102,9 @@ class Net(nn.Module):
         self.mse_loss = nn.MSELoss()
 
         # fix the encoder
-        for name in ['enc_1', 'enc_2', 'enc_3', 'enc_4']:
-            for param in getattr(self, name).parameters():
-                param.requires_grad = False
+        # for name in ['enc_1', 'enc_2', 'enc_3', 'enc_4']:
+        #     for param in getattr(self, name).parameters():
+        #         param.requires_grad = False
 
     # extract relu1_1, relu2_1, relu3_1, relu4_1 from input image
     def encode_with_intermediate(self, input):
@@ -122,12 +122,12 @@ class Net(nn.Module):
 
     def calc_content_loss(self, input, target):
         assert (input.size() == target.size())
-        assert (target.requires_grad is False)
+        # assert (target.requires_grad is False)
         return self.mse_loss(input, target)
 
     def calc_style_loss(self, input, target):
         assert (input.size() == target.size())
-        assert (target.requires_grad is False)
+        # assert (target.requires_grad is False)
         input_mean, input_std = calc_mean_std(input)
         target_mean, target_std = calc_mean_std(target)
         return self.mse_loss(input_mean, target_mean) + \
