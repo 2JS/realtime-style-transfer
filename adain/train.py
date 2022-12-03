@@ -109,7 +109,7 @@ style_iter = iter(data.DataLoader(
     sampler=InfiniteSamplerWrapper(style_dataset),
     num_workers=args.n_threads))
 
-optimizer = torch.optim.AdamW(network.parameters(), lr=args.lr)
+optimizer = torch.optim.Adam(network.parameters(), lr=args.lr)
 scheduler = torch.optim.lr_scheduler.CyclicLR(
     optimizer, 
     base_lr=1e-5, 
