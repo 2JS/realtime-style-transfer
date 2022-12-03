@@ -79,7 +79,7 @@ parser.add_argument('--log_dir', default='./logs',
 parser.add_argument('--lr', type=float, default=1e-4)
 parser.add_argument('--lr_decay', type=float, default=5e-4)
 parser.add_argument('--max_iter', type=int, default=160000)
-parser.add_argument('--batch_size', type=int, default=8)
+parser.add_argument('--batch_size', type=int, default=16)
 parser.add_argument('--style_weight', type=float, default=10.0)
 parser.add_argument('--content_weight', type=float, default=1.0)
 parser.add_argument('--n_threads', type=int, default=4)
