@@ -99,7 +99,7 @@ class Net(nn.Module):
         self.enc_1 = nn.Sequential(*enc_layers[:4])  # input -> relu1_1
         self.enc_2 = nn.Sequential(*enc_layers[4:11])  # relu1_1 -> relu2_1
         self.enc_3 = nn.Sequential(*enc_layers[11:18])  # relu2_1 -> relu3_1
-        self.enc_4 = nn.Sequential(*enc_layers[18:27])  # relu3_1 -> relu4_1
+        self.enc_4 = nn.Sequential(*enc_layers[18:26])  # relu3_1 -> relu4_1
         self.decoder = decoder
         self.mse_loss = nn.MSELoss()
 

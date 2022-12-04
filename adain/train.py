@@ -89,7 +89,7 @@ decoder = net.decoder
 vgg = net.vgg
 
 vgg.load_state_dict(torch.load(args.vgg))
-vgg = nn.Sequential(*list(vgg.children())[:27])
+vgg = nn.Sequential(*list(vgg.children())[:26])
 network = net.Net(vgg, decoder)
 network.train()
 network.to(device)
