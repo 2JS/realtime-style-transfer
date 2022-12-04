@@ -109,7 +109,7 @@ style_iter = iter(data.DataLoader(
     sampler=InfiniteSamplerWrapper(style_dataset),
     num_workers=args.n_threads))
 
-optimizer = torch.optim.AdamW(network.decoder.parameters(), lr=args.lr)
+optimizer = torch.optim.AdamW(network.decoder.parameters(), weight_decay=1e-4, lr=args.lr)
 
 for i in tqdm(range(args.max_iter)):
     adjust_learning_rate(optimizer, iteration_count=i)
