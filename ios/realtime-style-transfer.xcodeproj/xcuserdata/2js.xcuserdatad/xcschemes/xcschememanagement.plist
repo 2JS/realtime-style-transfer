@@ -4,10 +4,33 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>realtime-style-transfer.xcscheme_^#shared#^_</key>
+		<key>Release.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+		<key>realtime-style-transfer.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>75B78F6328DF4C290026FEA3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>75B78F7928DF4C2A0026FEA3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>75B78F8328DF4C2A0026FEA3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>
