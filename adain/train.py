@@ -88,7 +88,7 @@ writer = SummaryWriter(log_dir=str(log_dir))
 decoder = net.decoder
 vgg = net.vgg
 
-# vgg.load_state_dict(torch.load(args.vgg))
+vgg.load_state_dict(torch.load(args.vgg))
 vgg = nn.Sequential(*list(vgg.children())[:31])
 network = net.Net(vgg, decoder)
 network.train()
@@ -109,7 +109,7 @@ style_iter = iter(data.DataLoader(
     sampler=InfiniteSamplerWrapper(style_dataset),
     num_workers=args.n_threads))
 
-optimizer = torch.optim.AdamW(network.parameters(), lr=args.lr)
+optimizer = torch.optim.AdamW(network.decoder.parameters(), lr=args.lr)
 
 for i in tqdm(range(args.max_iter)):
     adjust_learning_rate(optimizer, iteration_count=i)
