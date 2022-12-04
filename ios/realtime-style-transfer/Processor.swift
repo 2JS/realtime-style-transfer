@@ -12,13 +12,13 @@ class Processor {
     static let shared = Processor()
 
     private let encoder = try! adain_vgg(configuration: MLModelConfiguration().then {
-        $0.computeUnits = .cpuAndGPU
-//        $0.allowLowPrecisionAccumulationOnGPU = true
+        $0.computeUnits = .all
+        $0.allowLowPrecisionAccumulationOnGPU = true
     })
 
     private let decoder = try! adain_dec(configuration: MLModelConfiguration().then {
-        $0.computeUnits = .cpuAndGPU
-//        $0.allowLowPrecisionAccumulationOnGPU = true
+        $0.computeUnits = .all
+        $0.allowLowPrecisionAccumulationOnGPU = true
     })
 
     private let loader = MTKTextureLoader(device: GPU.device)
@@ -32,6 +32,8 @@ class Processor {
 
     var textureCache: CVMetalTextureCache!
 
+    private(set) var isBusy: Bool = false
+
     init() {
         CVMetalTextureCacheCreate(kCFAllocatorDefault, nil, GPU.device, nil, &textureCache)
     }
@@ -41,34 +43,26 @@ class Processor {
     }
 
     func process(sampleBuffer: CMSampleBuffer) -> CIImage? {
-        guard //let mtlTexture = getTexture(from: sampleBuffer),
-//              (try? mtlTexture.convert(into: modelInputBuffer.texture)) != nil,
-//              let input = modelInputBuffer.mlmultiarray,
-//              let input = modelInputBuffer.texture.pixelBuffer,
-              let input = CMSampleBufferGetImageBuffer(sampleBuffer),
+        isBusy = true
+        defer {
+            isBusy = false
+        }
+
+        guard let input = CMSampleBufferGetImageBuffer(sampleBuffer),
               let latent = encode(input),
               let output = decode(content: latent, style: styleArray)
         else {
             return nil
         }
 
-//        modelOutputBuffer.mlmultiarray = output
-
-//        guard (try? modelOutputBuffer.texture.convert(into: outputBuffer.texture)) != nil
-//        else {
-//            return nil
-//        }
-//
         let orientation: CGImagePropertyOrientation
         if ProcessInfo().isiOSAppOnMac {
             orientation = .downMirrored
         } else {
             orientation = .down
         }
-//        print(CVPixelBufferGetPixelFormatType(output))
-//        print(kCVPixelFormatType_32BGRA, kCVPixelFormatType_32ARGB)
+
         return CIImage(cvPixelBuffer: output).oriented(orientation)
-//        return CIImage(mtlTexture: outputBuffer.texture)?.oriented(orientation)
     }
 
     func getTexture(from sampleBuffer: CMSampleBuffer) -> MTLTexture? {
@@ -111,8 +105,7 @@ class Processor {
 
         try texture.convert(into: styleInputBuffer.texture)
 
-        guard //let pixelBuffer = styleInputBuffer.texture.pixelBuffer,
-              let cgImage = style.cgImage,
+        guard let cgImage = style.cgImage,
               let style = try? encoder.prediction(input: adain_vggInput(xWith: cgImage)).var_147
         else {
             throw GPUError.generic
@@ -126,7 +119,6 @@ class Processor {
     }
 
     func encode(_ input: CVPixelBuffer) -> MLMultiArray? {
-//        try? encoder.prediction(input: adain_vggInput(xWith: input)).var_160
         let start = CFAbsoluteTimeGetCurrent()
         let result = try? encoder.prediction(x: input).var_147
 

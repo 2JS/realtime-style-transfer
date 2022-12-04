@@ -45,6 +45,8 @@ class CameraViewController: UIViewController {
         $0.distribution = .fillEqually
     }
 
+    private var pause: Bool = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -57,15 +59,15 @@ class CameraViewController: UIViewController {
         setupSession()
 
         videoStream.publisher
-            .throttle(for: 0.3, scheduler: RunLoop.current, latest: true)
             .sink { [unowned self] (sampleBuffer) -> Void in
-//                let start = CFAbsoluteTimeGetCurrent()
-                guard let ciImage =  Processor.shared.process(sampleBuffer: sampleBuffer)
+                let start = CFAbsoluteTimeGetCurrent()
+                guard !Processor.shared.isBusy,
+                      let ciImage =  Processor.shared.process(sampleBuffer: sampleBuffer)
                 else {
                     return
                 }
-//                let duration = CFAbsoluteTimeGetCurrent() - start
-//                print(duration)
+                let duration = CFAbsoluteTimeGetCurrent() - start
+                print(duration)
 
                 let uiImage = UIImage(ciImage: ciImage)
 
