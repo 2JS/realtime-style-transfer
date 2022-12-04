@@ -39,7 +39,7 @@ class CameraViewController: UIViewController {
     private lazy var stack = UIStackView(arrangedSubviews: [
         photoPickerButton,
         resetButton,
-        shareButton
+//        shareButton
     ]).then {
         $0.alignment = .center
         $0.distribution = .fillEqually
