@@ -134,9 +134,4 @@ for i in tqdm(range(args.max_iter)):
             state_dict[key] = state_dict[key].to(torch.device('cpu'))
         torch.save(state_dict, save_dir /
                    'decoder_iter_{:d}.pth'.format(i + 1))
-        state_dict = net.vgg.state_dict()
-        for key in state_dict.keys():
-            state_dict[key] = state_dict[key].to(torch.device('cpu'))
-        torch.save(state_dict, save_dir /
-                   'vgg_iter_{:d}.pth'.format(i + 1))
 writer.close()
