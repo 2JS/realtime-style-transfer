@@ -119,6 +119,8 @@ class CameraViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        UIApplication.shared.isIdleTimerDisabled = true
+
         switch AVCaptureDevice.authorizationStatus(for: .video) {
             case .authorized:
                 DispatchQueue.global().async { [weak self] in
