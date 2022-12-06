@@ -26,6 +26,7 @@ class CameraViewController: UIViewController {
         action: #selector(onResetButton)
     ).then {
         $0.tintColor = .white
+        $0.isEnabled = false
     }
 
     private lazy var shareButton = UIButton.systemButton(
@@ -200,6 +201,7 @@ class CameraViewController: UIViewController {
     @objc
     func onResetButton() {
         Processor.shared.discardStyle()
+        resetButton.isEnabled = false
     }
 }
 
@@ -234,6 +236,9 @@ extension CameraViewController: PHPickerViewControllerDelegate {
 
                 do {
                     try Processor.shared.encode(style: image)
+                    DispatchQueue.main.async { [weak self] in
+                        self?.resetButton.isEnabled = true
+                    }
                 } catch {
 
                 }
