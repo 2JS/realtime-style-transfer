@@ -1,7 +1,6 @@
 # pytorch-AdaIN
 
-This is an unofficial pytorch implementation of a paper, Arbitrary Style Transfer in Real-time with Adaptive Instance Normalization [Huang+, ICCV2017].
-I'm really grateful to the [original implementation](https://github.com/xunhuang1995/AdaIN-style) in Torch by the authors, which is very useful.
+Implementations are based on https://github.com/naoto0804/pytorch-AdaIN, unofficial pytorch implementation of Arbitrary Style Transfer in Real-time with Adaptive Instance Normalization [Huang+, ICCV2017]
 
 ![Results](results.png)
 
@@ -18,9 +17,6 @@ Please install requirements by `pip install -r requirements.txt`
 - TensorboardX
 
 ## Usage
-
-### Download models
-Download [decoder.pth](https://drive.google.com/file/d/1bMfhMMwPeXnYSQI6cDWElSZxOxc6aVyr/view?usp=sharing)/[vgg_normalized.pth](https://drive.google.com/file/d/1EpkBA2K2eYILDSyPTt0fztz59UjAIpZU/view?usp=sharing) and put them under `models/`.
 
 ### Test
 Use `--content` and `--style` to provide the respective path to the content and style image.
@@ -47,13 +43,12 @@ Some other options:
 
 ### Train
 Use `--content_dir` and `--style_dir` to provide the respective directory to the content and style images.
+Pretrained models in `models/` are trained with [MSCOCO images](http://mscoco.org/dataset/#download) and [Wikiart images](https://www.kaggle.com/c/painter-by-numbers).
 ```
 CUDA_VISIBLE_DEVICES=<gpu_id> python train.py --content_dir <content_dir> --style_dir <style_dir>
 ```
 
 For more details and parameters, please refer to --help option.
-
-I share the model trained by this code [here](https://drive.google.com/file/d/1YIBRdgGBoVllLhmz_N7PwfeP5V9Vz2Nr/view?usp=sharing)
 
 ## References
 - [1]: X. Huang and S. Belongie. "Arbitrary Style Transfer in Real-time with Adaptive Instance Normalization.", in ICCV, 2017.
