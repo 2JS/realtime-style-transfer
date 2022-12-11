@@ -9,3 +9,7 @@ Search 'Realtime Style Transfer' and download from App Store. Currently only iOS
 Open `ios/realtime-style-transfer.xcodeproj`, build with Xcode 14 or later. You may need a Apple developer account to run on actual device.
 
 Pretrained & CoreML converted weights are `adain/*.mlmodels`
+
+## Training & Testing
+
+See `adain/`.
