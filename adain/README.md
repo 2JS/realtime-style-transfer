@@ -17,6 +17,10 @@ Please install requirements by `pip install -r requirements.txt`
 - TensorboardX
 
 ## Usage
+### Download models
+
+We prepared pretrained decoder for you.
+Download encoder from [vgg_normalized.pth](https://drive.google.com/file/d/1EpkBA2K2eYILDSyPTt0fztz59UjAIpZU/view?usp=sharing) and put it under `models/`.
 
 ### Test
 Use `--content` and `--style` to provide the respective path to the content and style image.
