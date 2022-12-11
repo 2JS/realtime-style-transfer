@@ -12,4 +12,4 @@ Pretrained & CoreML converted weights are `adain/*.mlmodels`
 
 ## Training & Testing
 
-See `adain/`.
+See `adain/README.md`.
