@@ -48,7 +48,8 @@ class Processor {
             isBusy = false
         }
 
-        guard let input = CMSampleBufferGetImageBuffer(sampleBuffer),
+        guard let styleArray = styleArray,
+              let input = CMSampleBufferGetImageBuffer(sampleBuffer),
               let latent = encode(input),
               let output = decode(content: latent, style: styleArray)
         else {
@@ -128,9 +129,9 @@ class Processor {
         return result
     }
 
-    func decode(content: MLMultiArray, style: MLMultiArray? = nil) -> CVPixelBuffer? {
+    func decode(content: MLMultiArray, style: MLMultiArray) -> CVPixelBuffer? {
         let start = CFAbsoluteTimeGetCurrent()
-        let result = try? decoder.prediction(content: content, style: style ?? content).y
+        let result = try? decoder.prediction(content: content, style: style).y
 
         let duration = CFAbsoluteTimeGetCurrent() - start
         print("decoder", duration)

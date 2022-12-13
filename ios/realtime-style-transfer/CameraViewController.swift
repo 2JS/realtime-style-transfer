@@ -65,6 +65,7 @@ class CameraViewController: UIViewController {
                 guard !Processor.shared.isBusy,
                       let ciImage =  Processor.shared.process(sampleBuffer: sampleBuffer)
                 else {
+                    self.transferredView.image = nil
                     return
                 }
                 let duration = CFAbsoluteTimeGetCurrent() - start
@@ -148,6 +149,8 @@ class CameraViewController: UIViewController {
     private func setupSession() {
         session.beginConfiguration()
         defer { session.commitConfiguration() }
+
+        previewView.session = session
 
         guard let videoDevice: AVCaptureDevice =
             AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .unspecified) ??
