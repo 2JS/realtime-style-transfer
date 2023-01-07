@@ -11,12 +11,12 @@ let height = 480
 class Processor {
     static let shared = Processor()
 
-    private let encoder = try! adain_vgg(configuration: MLModelConfiguration().then {
+    private let encoder = try! Encoder(configuration: MLModelConfiguration().then {
         $0.computeUnits = .all
         $0.allowLowPrecisionAccumulationOnGPU = true
     })
 
-    private let decoder = try! adain_dec(configuration: MLModelConfiguration().then {
+    private let decoder = try! Decoder(configuration: MLModelConfiguration().then {
         $0.computeUnits = .all
         $0.allowLowPrecisionAccumulationOnGPU = true
     })
@@ -107,7 +107,7 @@ class Processor {
         try texture.convert(into: styleInputBuffer.texture)
 
         guard let cgImage = style.cgImage,
-              let style = try? encoder.prediction(input: adain_vggInput(xWith: cgImage)).var_147
+              let style = try? encoder.prediction(input: EncoderInput(xWith: cgImage)).var_121
         else {
             throw GPUError.generic
         }
@@ -121,7 +121,7 @@ class Processor {
 
     func encode(_ input: CVPixelBuffer) -> MLMultiArray? {
         let start = CFAbsoluteTimeGetCurrent()
-        let result = try? encoder.prediction(x: input).var_147
+        let result = try? encoder.prediction(x: input).var_121
 
         let duration = CFAbsoluteTimeGetCurrent() - start
         print("encoder", duration)
@@ -131,7 +131,7 @@ class Processor {
 
     func decode(content: MLMultiArray, style: MLMultiArray) -> CVPixelBuffer? {
         let start = CFAbsoluteTimeGetCurrent()
-        let result = try? decoder.prediction(content: content, style: style).y
+        let result = try? decoder.prediction(content: content, style: style).var_228
 
         let duration = CFAbsoluteTimeGetCurrent() - start
         print("decoder", duration)
