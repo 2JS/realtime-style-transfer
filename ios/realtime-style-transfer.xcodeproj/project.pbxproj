@@ -10,6 +10,8 @@
 		75195FCC2919567D0057AF82 /* VideoStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75195FCB2919567D0057AF82 /* VideoStream.swift */; };
 		752E06CC2956E1D0008229CF /* Encoder.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 752E06CA2956E1D0008229CF /* Encoder.mlmodel */; };
 		752E06CD2956E1D0008229CF /* Decoder.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 752E06CB2956E1D0008229CF /* Decoder.mlmodel */; };
+		7588B31929698D2C0015D06F /* Decoder16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 7588B31729698D2C0015D06F /* Decoder16.mlmodel */; };
+		7588B31A29698D2C0015D06F /* Encoder16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 7588B31829698D2C0015D06F /* Encoder16.mlmodel */; };
 		75892D9429194550002D625E /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75892D9329194550002D625E /* CameraViewController.swift */; };
 		75892D962919466B002D625E /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75892D952919466B002D625E /* PreviewView.swift */; };
 		75A86E2A293B24EE0048306C /* MTLTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A86E29293B24EE0048306C /* MTLTexture.swift */; };
@@ -55,6 +57,8 @@
 		75195FCB2919567D0057AF82 /* VideoStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoStream.swift; sourceTree = "<group>"; };
 		752E06CA2956E1D0008229CF /* Encoder.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Encoder.mlmodel; sourceTree = "<group>"; };
 		752E06CB2956E1D0008229CF /* Decoder.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Decoder.mlmodel; sourceTree = "<group>"; };
+		7588B31729698D2C0015D06F /* Decoder16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Decoder16.mlmodel; sourceTree = "<group>"; };
+		7588B31829698D2C0015D06F /* Encoder16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Encoder16.mlmodel; sourceTree = "<group>"; };
 		75892D9329194550002D625E /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 		75892D952919466B002D625E /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 		75A86E29293B24EE0048306C /* MTLTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTLTexture.swift; sourceTree = "<group>"; };
@@ -131,21 +135,23 @@
 		75B78F6628DF4C290026FEA3 /* realtime-style-transfer */ = {
 			isa = PBXGroup;
 			children = (
-				752E06CB2956E1D0008229CF /* Decoder.mlmodel */,
-				752E06CA2956E1D0008229CF /* Encoder.mlmodel */,
 				75F5A199291A85C100786128 /* adain_dec.mlmodel */,
 				75E9F08429251513004DB366 /* adain_vgg.mlmodel */,
+				752E06CB2956E1D0008229CF /* Decoder.mlmodel */,
+				7588B31729698D2C0015D06F /* Decoder16.mlmodel */,
+				752E06CA2956E1D0008229CF /* Encoder.mlmodel */,
+				7588B31829698D2C0015D06F /* Encoder16.mlmodel */,
 				75B78F7528DF4C2A0026FEA3 /* Info.plist */,
 				75B78F6728DF4C290026FEA3 /* AppDelegate.swift */,
 				75E9F082292503CF004DB366 /* BinaryInteger.swift */,
 				75892D9329194550002D625E /* CameraViewController.swift */,
+				75A86E2B293B26720048306C /* CVBuffer.swift */,
 				75E9F07E2924D6F5004DB366 /* GPU.swift */,
 				75E3986928ED9D450067469F /* Log.swift */,
 				75E9F08029250114004DB366 /* MTLPixelFormat.swift */,
 				75A86E29293B24EE0048306C /* MTLTexture.swift */,
 				75892D952919466B002D625E /* PreviewView.swift */,
 				75D48CAF292644910021A4F8 /* Processor.swift */,
-				75A86E2B293B26720048306C /* CVBuffer.swift */,
 				75B78F6928DF4C290026FEA3 /* SceneDelegate.swift */,
 				75BEDA2129260628002F4DAE /* TextureBuffer.swift */,
 				75195FCB2919567D0057AF82 /* VideoStream.swift */,
@@ -323,11 +329,13 @@
 				75892D9429194550002D625E /* CameraViewController.swift in Sources */,
 				75BEDA2229260628002F4DAE /* TextureBuffer.swift in Sources */,
 				752E06CD2956E1D0008229CF /* Decoder.mlmodel in Sources */,
+				7588B31A29698D2C0015D06F /* Encoder16.mlmodel in Sources */,
 				752E06CC2956E1D0008229CF /* Encoder.mlmodel in Sources */,
 				75E9F083292503CF004DB366 /* BinaryInteger.swift in Sources */,
 				75A86E2C293B26720048306C /* CVBuffer.swift in Sources */,
 				75E9F08529251513004DB366 /* adain_vgg.mlmodel in Sources */,
 				75B78F6828DF4C290026FEA3 /* AppDelegate.swift in Sources */,
+				7588B31929698D2C0015D06F /* Decoder16.mlmodel in Sources */,
 				75B78F6A28DF4C290026FEA3 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

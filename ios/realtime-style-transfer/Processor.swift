@@ -11,12 +11,12 @@ let height = 480
 class Processor {
     static let shared = Processor()
 
-    private let encoder = try! Encoder(configuration: MLModelConfiguration().then {
+    private let encoder = try! Encoder16(configuration: MLModelConfiguration().then {
         $0.computeUnits = .all
         $0.allowLowPrecisionAccumulationOnGPU = true
     })
 
-    private let decoder = try! Decoder(configuration: MLModelConfiguration().then {
+    private let decoder = try! Decoder16(configuration: MLModelConfiguration().then {
         $0.computeUnits = .all
         $0.allowLowPrecisionAccumulationOnGPU = true
     })
@@ -107,7 +107,7 @@ class Processor {
         try texture.convert(into: styleInputBuffer.texture)
 
         guard let cgImage = style.cgImage,
-              let style = try? encoder.prediction(input: EncoderInput(xWith: cgImage)).var_121
+              let style = try? encoder.prediction(input: Encoder16Input(xWith: cgImage)).var_121
         else {
             throw GPUError.generic
         }
